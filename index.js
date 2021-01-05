@@ -1,6 +1,5 @@
 const XLSX = require('xlsx');
 const fs = require('fs');
-const shell = require('shelljs');
 const path = require('path');
 
 const createPath = (targetDir) => {
@@ -19,7 +18,7 @@ const createFile = (targetDir, fileName, extension) => {
 	fs.closeSync(fs.openSync(`${targetDir}/${fileName}${extension}`, 'w'));
 }
 
-module.exports = (fileToRead) => {
+const reader = (fileToRead) => {
 
    var workbook = XLSX.readFile(fileToRead);
 
@@ -66,3 +65,8 @@ module.exports = (fileToRead) => {
 
    });
 }
+
+const argv = process.argv;
+console.log(argv[2]);
+
+reader(argv[2]);
