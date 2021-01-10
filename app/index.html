@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tool Name!</title>
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="./index.css" />
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+</head>
+<body style="height: 100vh;">
+    <div class="grid-container">
+        <header class="header">
+            <h1>Title!</h1>
+        </header>
+        <main class="main">
+            <p>
+                Some information how to use tool!
+            </p>
+            
+            <div style="padding: 10%">
+                <div>
+                    <form>
+                        <legend>Load Excel File and Select folder</legend>
+                        <div class="input-group mb-3">
+                            <label class="btn btn-primary" id='fileToRead'  for="inputGroupFile01"> Select File </label>
+                            <fieldset disabled>
+                                <input type="text" id="filePath" class="form-control" placeholder="No File Selected">
+                            </fieldset>
+                        </div>
+                        <div class="input-group mb-3">
+                            <label id="selectedFolder" class="btn btn-primary" >Select Folder</label>
+                            <fieldset disabled>
+                                <input type="text" id="folderPath" class="form-control" placeholder="No Folder Selected">
+                            </fieldset>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="background-color: #133146; border-color: #133146">Submit</button>
+                    </form>
+                </div>
+            </div>    
+        </main>
+        <footer class="footer"></footer>      
+        
+    </div>
+    
+</body>
+<script src="renderer.js">
+    
+</script>
+</html>
