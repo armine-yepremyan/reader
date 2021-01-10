@@ -1,7 +1,7 @@
 const { app, dialog, BrowserWindow } = require('electron')
 const ipc = require('electron').ipcMain;
 // const os = require('os');
-const createFilesDirectories = require('./halper');
+const createFilesDirectories = require('./utilities');
 
 
 let mainWindow = null;
