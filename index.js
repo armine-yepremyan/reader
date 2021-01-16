@@ -1,5 +1,6 @@
 	const XLSX = require('xlsx');
-	const fs = require('fs');
+	//const fs = require('fs');
+	const fs = require(	'fs-extra');
 	const path = require('path');
 
 	const createPath = (targetDir) => {
@@ -55,21 +56,65 @@ const reader = (fileToRead, _root, localNASpath) => {
 			 var exDay = dayNumbers[exDateConv.getDate()-1];
 			 var pLastName = (worksheet[`F${r+1}`] ? worksheet[`F${r+1}`].v : undefined);
 			 var pName = (worksheet[`G${r+1}`] ? worksheet[`G${r+1}`].v : undefined);
-			 var typeP = (worksheet[`L${r+1}`] ? worksheet[`L${r+1}`].v : undefined);
 
-			 // if typeP is "preProtesi" then typeP=1; if is "PostProtesi" then typeP=2 ; else = undefined
-			 if (typeP != undefined) {
+
+			 var typeDep = (worksheet[`J${r+1}`] ? worksheet[`J${r+1}`].v : undefined);
+			 if (typeDep != undefined) {
 				 var pathSubFolderOut = '';
-				 if (typeP.includes("Pre Protesi")){
-					 pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`; //ex: 2021_01_04_PreProtesi_
-					 typeP = 1; //console.log(`type patient ${typeP}`)
-				} else if (typeP.includes("Post Protesi")){
+        if (typeDep.includes("Ambulatoriale")){
+					//pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`; //ex: 2021_01_04_PostProtesi_
+					typeDep = 1; //console.log(`type patient ${typeP}`)
+				}
+				else if (typeDep.includes("Nutrizionale")){
+					//pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`; //ex: 2021_01_04_PostProtesi_
+					typeDep = 2; //console.log(`type patient ${typeP}`)
+				}
+				else if (typeDep.includes("RRF")){
 					pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`; //ex: 2021_01_04_PostProtesi_
-					typeP = 2; //console.log(`type patient ${typeP}`)
-				} else {
+					typeDep = 3; //console.log(`type patient ${typeP}`)
+				}
+				else if (typeDep.includes("CMF")){
+						pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`; //ex: 2021_01_04_PostProtesi_
+						typeDep = 4; //console.log(`type patient ${typeP}`)
+					}
+					else {
 					console.log(`error type patient`)
 					}
 				}
+
+
+			 var typeP = (worksheet[`L${r+1}`] ? worksheet[`L${r+1}`].v : undefined);
+			 if (typeP != undefined) {
+				 var pathSubFolderOut = '';
+				 if (typeP.includes("Pre Protesi")){
+					 pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`;
+					 typeP = 1; //console.log(`type patient ${typeP}`)
+				} else if (typeP.includes("Post Protesi")){
+					pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`;
+					typeP = 2; //console.log(`type patient ${typeP}`)
+				} else if (typeP.includes("Protesi")){
+					pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`;
+					typeP = 3; //console.log(`type patient ${typeP}`)
+				}
+				else if (typeP.includes("Nutrizionale I")){
+					//pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`
+					typeP = 4; //console.log(`type patient ${typeP}`)
+				}
+				else if (typeP.includes("Nutrizionale D")){
+					//pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`;
+					typeP = 5; //console.log(`type patient ${typeP}`)
+				}
+					else if (typeP.includes("Nutrizionale")){
+						//pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`;
+						typeP = 5; //console.log(`type patient ${typeP}`)
+					}
+					else {
+					console.log(`error type patient`)
+					}
+				}
+
+
+
 
 				var typeProsthesis = (worksheet[`M${r+1}`] ? worksheet[`M${r+1}`].v : undefined);
 
@@ -140,11 +185,11 @@ const reader = (fileToRead, _root, localNASpath) => {
 				 }
 				 if (exR != null) {
 					 exNamesToCreate.push('AnalisiCammino_CinDin');
-					 exNamesToCreate.push('AnalisiCamminoTreadmill_CinDin');
-					 exNamesToCreate.push('AnalisiCorsaTreadmill_CinDin');
+					 exNamesToCreate.push('AnalisiCamminoTreadmill_XXkmh_CinDin');
+					 exNamesToCreate.push('AnalisiCorsaTreadmill_XXkmh_CinDin');
 				 }
 				 if (exCMJS != null) {
-					 exNamesToCreate.push('AnalisiSquatBipodalico_CinDin');
+					 exNamesToCreate.push('AnalisiSquat_Bipodalico_CinDin');
 				 }
 				 if (exF != null) {
 					 exNamesToCreate.push('AnalisiCervicale_Cin');
@@ -154,7 +199,7 @@ const reader = (fileToRead, _root, localNASpath) => {
 				 }
 				 if (exE != null) {
 					 exNamesToCreate.push('Baropodometria');
-					 exNamesToCreate.push('TUG');
+					 exNamesToCreate.push('Walk');
 				 }
 				 if (exD != null) {
 					 exNamesToCreate.push('Baropodometria');
@@ -163,11 +208,17 @@ const reader = (fileToRead, _root, localNASpath) => {
 
 					 switch (typeP) {
 						 case 1:
-						        exNamesToCreate.push('Pre_Walk&TUG');
+						        exNamesToCreate.push('Walk_PreProtesi');
 						        break;
 						case 2:
-						        exNamesToCreate.push('Post_Walk&TUG');
-					          exNamesToCreate.push('ConfrontoPreVsPost_Walk&TUG'); //add control: create only if Pre present
+						        exNamesToCreate.push('Walk_PostProtesi');
+					          exNamesToCreate.push('Walk_Protesi_ConfrontoPreVsPost'); //add control: create only if Pre present
+										break;
+						case 4:
+										exNamesToCreate.push('Walk&TUG_Ingresso');
+										break;
+						case 5:
+										exNamesToCreate.push('Walk&TUG_Dimissione');
 										break;
 						case undefined:
 						        exNamesToCreate.push('Walk');;
@@ -175,7 +226,8 @@ const reader = (fileToRead, _root, localNASpath) => {
 					  }
 				}
 
-				 if (exTUG != null && typeP == undefined) {
+
+				 if (exTUG != null && (typeP == undefined || [1,2,4,5].indexOf(typeP) == -1)) {
 					 exNamesToCreate.push('TUG');
 				 }
 				 if (ex6MWT != null) {
@@ -190,18 +242,45 @@ const reader = (fileToRead, _root, localNASpath) => {
 					let fileNameOut = '';
 					pathFileOut =`${_root}${exDay} ${exMonthName} ${exYear}`;
 					pathFolderOut =`${pathFileOut}\\${pLastName.toUpperCase()} ${pName.toUpperCase()}\\`;
-					fileNameOut=`${exYear}_${exMonth}_${exDay}_${pLastName}_${pName}`;
+					fileNameOut=`${exYear}_${exMonth}_${exDay}_${pLastName.replace(/\s/g, '')}_${pName.replace(/\s/g, '')}`;
+
+
+
+
+				//  if in NAS folder "pLastName pName" in in localNASpath
+				console.log(`searching path in NAS: ${`${localNASpath}\\${pLastName.toUpperCase()} ${pName.toUpperCase()}\\`}`);
+				// then copy folder from NAS to pathFileOut
+				// else createPath(pathFolderOut)
+				if (fs.existsSync(`${localNASpath}\\${pLastName.toUpperCase()} ${pName.toUpperCase()}\\`)) {
+					console.log('exists in NAS');
+					fs.copySync(`${localNASpath}\\${pLastName.toUpperCase()} ${pName.toUpperCase()}\\`, pathFolderOut)
+				}
+				else {
+					console.log('NOT exists in NAS');
+					createPath(pathFolderOut)
+				}
+
+
 
 	      //  console.log(`nome del path ${pathFileOut}`);				//	console.log(`nome del path ${pathFolderOut}`);				//	console.log(`nome del file ${fileNameOut}`);
-					createPath(pathFolderOut);
 					if (typeP != undefined && typeof pathSubFolderOut !== 'undefined') {
 						createPath(`${pathFolderOut}\\${pathSubFolderOut}`)
 				  }
 
+        //  for each date created, creat a "base empty folder/file combination" for Pre and Post ex
+        createPath(`${pathFileOut}\\xxx`)
+        createPath(`${pathFileOut}\\${exYear}_${exMonth}_${exDay}_PreProtesi_`)
+        createPath(`${pathFileOut}\\${exYear}_${exMonth}_${exDay}_PostProtesi_`)
+				createFile(pathFileOut, `_AnalisiCammino_CinDin_${exYear}_${exMonth}_${exDay}`,`.txt`);
+				createFile(pathFileOut, `_Walk_PostProtesi_${exYear}_${exMonth}_${exDay}`,`.txt`);
+				createFile(pathFileOut, `_Walk_PreProtesi_${exYear}_${exMonth}_${exDay}`,`.txt`);
+				createFile(pathFileOut, `_Walk_Protesi_ConfrontoPreVsPost_${exYear}_${exMonth}_${exDay}`,`.txt`);
 
-					for (let i = 0; i < exNamesToCreate.length; i++) {
+				for (let i = 0; i < exNamesToCreate.length; i++) {
 				  	createFile(pathFileOut, `${fileNameOut}_${exNamesToCreate[i]}`,`.txt`);
 					}
+
+
 	  }
 	});
 	}
