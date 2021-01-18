@@ -60,7 +60,6 @@ const reader = (fileToRead, _root, localNASpath) => {
 
 			 var typeDep = (worksheet[`J${r+1}`] ? worksheet[`J${r+1}`].v : undefined);
 			 if (typeDep != undefined) {
-				 var pathSubFolderOut = '';
         if (typeDep.includes("Ambulatoriale")){
 					//pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`; //ex: 2021_01_04_PostProtesi_
 					typeDep = 1; //console.log(`type patient ${typeP}`)
@@ -84,16 +83,16 @@ const reader = (fileToRead, _root, localNASpath) => {
 
 
 			 var typeP = (worksheet[`L${r+1}`] ? worksheet[`L${r+1}`].v : undefined);
+			 var pathSubFolderOut = `${exYear}_${exMonth}_${exDay}`;
 			 if (typeP != undefined) {
-				 var pathSubFolderOut = '';
 				 if (typeP.includes("Pre Protesi")){
-					 pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`;
+					 pathSubFolderOut=`${pathSubFolderOut}_${typeP}_`;
 					 typeP = 1; //console.log(`type patient ${typeP}`)
 				} else if (typeP.includes("Post Protesi")){
-					pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`;
+					pathSubFolderOut=`${pathSubFolderOut}_${typeP}_`;
 					typeP = 2; //console.log(`type patient ${typeP}`)
 				} else if (typeP.includes("Protesi")){
-					pathSubFolderOut=`${exYear}_${exMonth}_${exDay}_${typeP}_`;
+					pathSubFolderOut=`${pathSubFolderOut}_${typeP}_`;
 					typeP = 3; //console.log(`type patient ${typeP}`)
 				}
 				else if (typeP.includes("Nutrizionale I")){
@@ -242,19 +241,26 @@ const reader = (fileToRead, _root, localNASpath) => {
 					let fileNameOut = '';
 					pathFileOut =`${_root}${exDay} ${exMonthName} ${exYear}`;
 					pathFolderOut =`${pathFileOut}\\${pLastName.toUpperCase()} ${pName.toUpperCase()}\\`;
-					fileNameOut=`${exYear}_${exMonth}_${exDay}_${pLastName.replace(/\s/g, '')}_${pName.replace(/\s/g, '')}`;
+					fileNameOut=`${pLastName.replace(/\s/g, '')}_${pName.replace(/\s/g, '')}`;
 
 
 
 
-				//  if in NAS folder "pLastName pName" in in localNASpath
+
 				console.log(`searching path in NAS: ${`${localNASpath}\\${pLastName.toUpperCase()} ${pName.toUpperCase()}\\`}`);
-				// then copy folder from NAS to pathFileOut
-				// else createPath(pathFolderOut)
-				if (fs.existsSync(`${localNASpath}\\${pLastName.toUpperCase()} ${pName.toUpperCase()}\\`)) {
-					console.log('exists in NAS');
+        //  if in NAS folder "pLastName pName" in in localNASpath
+				if (fs.existsSync(`${localNASpath}\\${pLastName.toUpperCase()} ${pName.toUpperCase()}\\`)){
+				  console.log('exists in NAS');
+					// then copy folder from NAS to pathFileOut
 					fs.copySync(`${localNASpath}\\${pLastName.toUpperCase()} ${pName.toUpperCase()}\\`, pathFolderOut)
+
+
+					// if there are files in this folder, put them in a new subfloder "OLD"
+var files = fs.readdirSync(pathFolderOut);
+console.log(files);
+
 				}
+        // else createPath(pathFolderOut)
 				else {
 					console.log('NOT exists in NAS');
 					createPath(pathFolderOut)
@@ -262,10 +268,9 @@ const reader = (fileToRead, _root, localNASpath) => {
 
 
 
-	      //  console.log(`nome del path ${pathFileOut}`);				//	console.log(`nome del path ${pathFolderOut}`);				//	console.log(`nome del file ${fileNameOut}`);
-					if (typeP != undefined && typeof pathSubFolderOut !== 'undefined') {
-						createPath(`${pathFolderOut}\\${pathSubFolderOut}`)
-				  }
+	      //  create subfolder
+				createPath(`${pathFolderOut}\\${pathSubFolderOut}`)
+
 
         //  for each date created, creat a "base empty folder/file combination" for Pre and Post ex
         createPath(`${pathFileOut}\\xxx`)
@@ -277,7 +282,7 @@ const reader = (fileToRead, _root, localNASpath) => {
 				createFile(pathFileOut, `_Walk_Protesi_ConfrontoPreVsPost_${exYear}_${exMonth}_${exDay}`,`.txt`);
 
 				for (let i = 0; i < exNamesToCreate.length; i++) {
-				  	createFile(pathFileOut, `${fileNameOut}_${exNamesToCreate[i]}`,`.txt`);
+				  	createFile(pathFileOut, `${fileNameOut}_${exNamesToCreate[i]}_${exYear}_${exMonth}_${exDay}_`,`.txt`);
 					}
 
 
